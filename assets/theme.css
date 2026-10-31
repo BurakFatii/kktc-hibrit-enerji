@@ -1,0 +1,135 @@
+/* KKTC Hibrit Enerji — düz, gölgesiz tema. Neon (Matrix) yeşili + siyah/beyaz. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+:root, .light {
+  --neon: #00c93a;          /* dolgu ve vurgu (açık temada bir ton koyu) */
+  --zone-red: #d92d20; --zone-yellow: #c99700; --zone-blue: #1d5fd1;
+  --ok: #00892a; --bad: #d92d20;
+  --neon-ink: #007a23;      /* açık temada okunabilir yeşil metin */
+  --neon-soft: rgba(0, 200, 50, 0.10);
+  --bg: #ffffff;
+  --fg: #000000;
+  --muted: #45484c;
+  --line: #e3e3e3;
+  --track: #efefef;
+}
+.dark {
+  --neon: #00ff41;
+  --zone-red: #ff4d40; --zone-yellow: #ffd60a; --zone-blue: #4d9bff;
+  --ok: #00ff41; --bad: #ff4d40;
+  --neon-ink: #00ff41;
+  --neon-soft: rgba(0, 255, 65, 0.08);
+  --bg: #000000;
+  --fg: #ffffff;
+  --muted: #b8b8b8;
+  --line: #1e1e1e;
+  --track: #121212;
+}
+
+/* Radix vurgu rengini neon yap, gölgeleri kaldır */
+html .radix-themes[data-accent-color] {
+  --accent-1: var(--bg); --accent-2: var(--neon-soft);
+  --accent-3: rgba(0, 255, 65, 0.10); --accent-4: rgba(0, 255, 65, 0.16); --accent-5: rgba(0, 255, 65, 0.22);
+  --accent-6: rgba(0, 200, 50, 0.35); --accent-7: rgba(0, 200, 50, 0.5); --accent-8: rgba(0, 200, 50, 0.7);
+  --accent-9: var(--neon); --accent-10: #2bff63; --accent-11: var(--neon-ink); --accent-12: var(--fg);
+  --accent-a1: transparent; --accent-a2: var(--neon-soft);
+  --accent-a3: rgba(0, 255, 65, 0.10); --accent-a4: rgba(0, 255, 65, 0.16); --accent-a5: rgba(0, 255, 65, 0.22);
+  --accent-a6: rgba(0, 200, 50, 0.35); --accent-a7: rgba(0, 200, 50, 0.5); --accent-a8: rgba(0, 200, 50, 0.7);
+  --accent-a9: var(--neon); --accent-a10: #2bff63; --accent-a11: var(--neon-ink); --accent-a12: var(--fg);
+  --accent-contrast: #000000; --accent-surface: var(--neon-soft);
+  --accent-indicator: var(--neon); --accent-track: var(--neon);
+  --focus-8: var(--neon);
+  --color-background: var(--bg);
+  --color-panel-solid: var(--bg);
+  --color-panel-translucent: var(--bg);
+  --shadow-1: none; --shadow-2: none; --shadow-3: none; --shadow-4: none; --shadow-5: 0 0 0 1px var(--line); --shadow-6: 0 0 0 1px var(--line);
+  --default-font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --code-font-family: "JetBrains Mono", ui-monospace, monospace;
+  background: var(--bg);
+}
+body { background: var(--bg); color: var(--fg); }
+/* Metin kontrastı: temaya göre tam beyaz / tam siyah; Radix gri metinleri de değişkenlere bağlı */
+html .radix-themes { color: var(--fg); --gray-11: var(--muted); --gray-12: var(--fg); --gray-a11: var(--muted); --gray-a12: var(--fg); }
+.rt-Text, .rt-Heading, .rt-TableCell, .rt-TableColumnHeaderCell, .rt-TableRowHeaderCell { color: inherit; }
+.rt-TableColumnHeaderCell { color: var(--muted); font-weight: 600; }
+.rt-TableCell { color: var(--fg); }
+.rt-BaseCard { --base-card-surface-box-shadow: inset 0 0 0 1px var(--line); --base-card-surface-hover-box-shadow: inset 0 0 0 1px var(--line); --base-card-surface-active-box-shadow: inset 0 0 0 1px var(--line); background: var(--bg) !important; }
+.rt-BaseCard::before, .rt-BaseCard::after { box-shadow: none !important; }
+
+/* Düz panel */
+.panel { border: 1px solid var(--line); border-radius: 4px; background: var(--bg); padding: 16px; width: 100%; }
+.mono { font-family: var(--code-font-family); font-variant-numeric: tabular-nums; }
+.ink { color: var(--neon-ink); }
+.muted { color: var(--muted); }
+.eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* Yüzde bar */
+.track { height: 6px; background: var(--track); border-radius: 1px; overflow: hidden; width: 100%; }
+.fill { height: 100%; background: var(--neon); transition: width .6s ease; }
+.fill.dim { background: var(--muted); }
+
+/* Ortadan sapan bar (−1…+1) */
+.dtrack { position: relative; height: 6px; background: var(--track); width: 100%; }
+.dtrack .mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--fg); opacity: .5; }
+.dtrack .dfill { position: absolute; top: 0; bottom: 0; background: var(--neon); }
+
+/* Batarya */
+.battery { display: flex; align-items: center; gap: 3px; width: 100%; }
+.battery .body { position: relative; flex: 1; height: 34px; border: 2px solid var(--fg); border-radius: 3px; padding: 3px; }
+.battery .lvl { height: 100%; background: var(--neon); transition: width .6s ease; }
+.battery .lvl.low { background: var(--muted); }
+.battery .nub { width: 4px; height: 14px; background: var(--fg); border-radius: 0 2px 2px 0; }
+.battery .ticks { position: absolute; inset: 3px; display: grid; grid-template-columns: repeat(5, 1fr); pointer-events: none; }
+.battery .ticks span { border-right: 2px solid var(--bg); }
+.battery .ticks span:last-child { border-right: none; }
+
+/* 3 kademeli seviye */
+.lvl3 { display: flex; gap: 3px; }
+.lvl3 span { width: 14px; height: 6px; background: var(--track); }
+.lvl3 span.on { background: var(--neon); }
+
+/* Güç akışı */
+.flowbox { position: relative; width: 100%; height: 280px; }
+.flowbox > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.flow { stroke: var(--line); stroke-width: 2; fill: none; vector-effect: non-scaling-stroke; }
+.flow.on { stroke: var(--neon); stroke-dasharray: 6 6; animation: flowdash 0.9s linear infinite; }
+.flow.on.rev { animation-direction: reverse; }
+@keyframes flowdash { to { stroke-dashoffset: -12; } }
+.node { position: absolute; transform: translate(-50%, -50%); border: 1px solid var(--line); background: var(--bg); padding: 8px 10px; min-width: 92px; text-align: center; border-radius: 4px; }
+.node.on { border-color: var(--neon); }
+.node.hub { min-width: 70px; }
+
+/* 24 saat şeridi */
+.strip { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; align-items: end; height: 64px; }
+.strip .bar { width: 100%; min-height: 2px; background: var(--track); }
+.strip .bar.gain { background: var(--neon); }
+.strip .bar.use { background: var(--fg); opacity: .55; }
+.strip .bar.grid { background: var(--muted); opacity: .45; }
+.strip .bar.curt { background: transparent; outline: 1px solid var(--neon); outline-offset: -1px; }
+.strip.soc { height: 28px; }
+.strip.soc .bar { background: var(--neon); opacity: .45; }
+.legend-dot { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; }
+
+/* SVG göstergeler */
+.gauge-line { stroke: var(--line); fill: none; stroke-width: 1.5; }
+.gauge-fg { stroke: var(--fg); fill: none; stroke-width: 1.5; }
+.gauge-neon { stroke: var(--neon); fill: none; stroke-width: 3; }
+.gauge-fill-neon { fill: var(--neon); }
+.gauge-text { fill: var(--muted); font-size: 10px; font-family: var(--code-font-family); }
+.rot { transition: transform .6s ease; transform-box: view-box; }
+
+/* Diyagram (Nasıl Çalışır) */
+.dnode { border: 1px solid var(--line); border-radius: 4px; padding: 12px; background: var(--bg); }
+.dnode.key { border-color: var(--neon); }
+.dconn { width: 1px; height: 22px; background: var(--neon); margin: 0 auto; }
+.hconn { height: 1px; background: var(--neon); flex: 1; min-width: 16px; }
+
+@media (prefers-reduced-motion: reduce) { .flow.on { animation: none; } .fill, .battery .lvl, .rot { transition: none; } }
+
+/* Harita altlığı: OSM karoları, temaya göre filtre (gölgesiz, sade) */
+div.ol-base { filter: grayscale(1) contrast(0.95) brightness(1.04); }
+.dark div.ol-base { filter: grayscale(1) invert(1) brightness(0.85) contrast(1.15); }
+.ol-attribution { font-size: 10px; }
+.ol-zoom button, .ol-attribution button { background: var(--bg) !important; color: var(--fg) !important; border: 1px solid var(--line) !important; border-radius: 2px !important; }
+/* Grid hücreleri içerik yüzünden taşmasın */
+.rt-Grid > * { min-width: 0; }

@@ -1,0 +1,14 @@
+# Uygulama
+reflex==0.8.28.post1
+plotly==7.1.0
+httpx==0.28.1
+greenlet==3.5.6
+# Enerji modelleme (sektör standardı kütüphaneler)
+shapely==2.2.0  # kısıt bölgeleri (geometri)
+pvlib==0.16.1
+windpowerlib==0.2.2
+# Bilimsel yığın — pvlib/windpowerlib'in test edildiği aralıkta sabit
+numpy==2.2.6
+pandas==2.3.3
+# Test
+pytest==9.2.0

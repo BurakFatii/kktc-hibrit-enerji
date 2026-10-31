@@ -1,0 +1,12 @@
+.states
+.web
+*.db
+.venv/
+.web/
+.states/
+.cache/
+__pycache__/
+*.py[cod]
+assets/external/
+.playwright-mcp/
+.DS_Store
