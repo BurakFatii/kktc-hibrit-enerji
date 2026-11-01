@@ -5,7 +5,7 @@ from ..components import error_box, kv_table, loading_line, page, status_badge
 from ..core.config import REGION_KINDS, REGIONS
 from ..olmap import ol_map
 from ..state import MapState
-from ..viz import compass, diverge, eyebrow, meter, ok_icon, panel, tilt_view
+from ..viz import compass, diverge, eyebrow, live_dot, meter, ok_icon, panel, tilt_view
 
 K = MapState.kpi
 
@@ -14,29 +14,37 @@ def kktc_map(height: str = "480px") -> rx.Component:
     return ol_map(markers=MapState.markers, center=[35.25, 33.55], zoom=9, map_height=height,
                   tile_style=rx.color_mode_cond(light="light", dark="dark"),
                   zones_url="/kisit_bolgeleri.geojson", show_zones=MapState.show_zones,
+                  solar=MapState.solar_field, show_solar=MapState.show_solar,
+                  wind=MapState.wind_field, show_wind=MapState.show_wind,
                   on_pick=MapState.map_pick)
 
 
-ZONE_LEGEND = [("var(--zone-red)", "İkisine de uygun değil"),
-               ("var(--zone-yellow)", "Yalnızca güneşe uygun"),
-               ("var(--zone-blue)", "Yalnızca rüzgâra uygun")]
-
-
 def zones_legend() -> rx.Component:
-    """Kısıt katmanı lejantı + aç/kapa."""
+    """Uygunluk katmanı aç/kapa (renk lejantı kullanıcı kararıyla gösterilmez)."""
     return rx.hstack(
         rx.hstack(rx.switch(checked=MapState.show_zones, on_change=MapState.toggle_zones, size="1"),
                   rx.text("Uygunluk katmanı", size="1", weight="medium"), align="center", spacing="2"),
-        *[rx.hstack(rx.box(width="14px", height="10px",
-                           style={"background": color, "opacity": "0.55", "outline": f"1.5px solid {color}"}),
-                    rx.text(t, size="1", class_name="muted"), align="center", spacing="1")
-          for color, t in ZONE_LEGEND],
-        rx.hstack(rx.box(width="14px", height="10px", style={"outline": "1px solid var(--line)"}),
-                  rx.text("Boyasız alan: ikisine de uygun", size="1", class_name="muted"),
-                  align="center", spacing="1"),
-        rx.hstack(rx.box(width="18px", height="0", style={"borderTop": "1.5px dashed var(--fg)"}),
-                  rx.text("KKTC kara sınırı", size="1", class_name="muted"), align="center", spacing="1"),
         spacing="4", wrap="wrap", align="center", width="100%",
+    )
+
+
+def layer_switch(checked, on_change, label: str, live: bool = False) -> rx.Component:
+    return rx.hstack(rx.switch(checked=checked, on_change=on_change, size="1"),
+                     rx.text(label, size="1", weight="medium"),
+                     live_dot() if live else rx.fragment(), align="center", spacing="2")
+
+
+def weather_layers() -> rx.Component:
+    """Güneş ısı haritası ve rüzgâr akımı katmanları (başta kapalı)."""
+    return rx.vstack(
+        rx.flex(
+            layer_switch(MapState.show_solar, MapState.toggle_solar, "Güneş ışınımı (yıllık)"),
+            layer_switch(MapState.show_wind, MapState.toggle_wind, "Rüzgâr akımı (100 m)", live=True),
+            wrap="wrap", align="center", width="100%", style={"gap": "8px 20px"},
+        ),
+        loading_line(MapState.layer_loading, "Katman verisi yükleniyor…"),
+        rx.cond(MapState.layer_error != "", rx.text(MapState.layer_error, size="1", class_name="muted")),
+        spacing="2", width="100%",
     )
 
 
@@ -181,6 +189,7 @@ def harita() -> rx.Component:
         ),
         rx.box(kktc_map(), class_name="panel", padding="0", overflow="hidden"),
         zones_legend(),
+        weather_layers(),
         rx.text("Haritada herhangi bir noktaya tıklayın. Siyah: konumunuz · beyaz: seçili nokta. Kısıt mesafeleri "
                 "(havalimanı ~5 km, yerleşim 0,3–1,5 km) yaklaşık planlama değerleridir; kesin sınır için kurum izni gerekir.",
                 size="1", class_name="muted"),
@@ -219,6 +228,5 @@ def harita() -> rx.Component:
             ),
         ),
         title="Harita ve konum analizi",
-        subtitle="Seçilen noktada güneş ve rüzgâr potansiyeli, en iyi panel açısı ve türbin yönü.",
         back=("Veriler", "/veriler"),
     )

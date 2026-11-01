@@ -4,11 +4,40 @@ import reflex as rx
 from ..components import error_box, loading_line, page, section
 from ..state import AnalysisState, MapState, ScenarioState
 from ..viz import bar_list, city_panel, eyebrow, meter, panel
-from .harita import kktc_map, restriction_card, zones_legend
+from .harita import kktc_map, restriction_card, weather_layers, zones_legend
 
 K = MapState.kpi
 A = AnalysisState.kpi
 S = ScenarioState.smart
+
+
+def _brief_head() -> rx.Component:
+    return rx.hstack(rx.icon("sparkles", size=13, class_name="ink"), eyebrow("Yatırımcı için özet"),
+                     spacing="1", align="center")
+
+
+def investor_brief() -> rx.Component:
+    """Harita + özet panelinin altında, tam genişlikte yapay zekâ yatırımcı metni.
+    Yazılırken metin satırı biçiminde sakin bir iskelet; hata olursa kutu hiç çizilmez."""
+    return rx.cond(
+        MapState.brief != "",
+        panel(rx.vstack(_brief_head(), rx.box(rx.markdown(MapState.brief), class_name="brief brief-in"),
+                        spacing="2", width="100%")),
+        rx.cond(
+            MapState.brief_loading,
+            panel(rx.vstack(
+                _brief_head(),
+                rx.box(*[rx.box(class_name="sk-line", style={"width": w})
+                         for w in ("96%", "92%", "88%", "60%")],
+                       class_name="sk", custom_attrs={"aria-busy": "true", "aria-label": "Özet hazırlanıyor"}),
+                spacing="2", width="100%")),
+        ),
+    )
+
+
+def layer_toggles() -> rx.Component:
+    """Harita katmanı aç/kapa: 'Bir yılda ne üretir?' üstünde; nokta seçilmeden de görünür."""
+    return rx.vstack(zones_legend(), weather_layers(), spacing="2", width="100%")
 
 
 def map_section() -> rx.Component:
@@ -18,24 +47,26 @@ def map_section() -> rx.Component:
             rx.vstack(
                 rx.text(MapState.sel_label, size="4", weight="bold"),
                 restriction_card(compact=True),
+                layer_toggles(),
                 eyebrow("Bir yılda ne üretir?"),
                 meter("1 kW güneş paneli", K["yf"] + " kWh", K["yf_rel"]),
                 meter("1 kW rüzgâr türbini", K["wa"] + " kWh", K["wa_rel"]),
                 spacing="3", width="100%",
             ),
             rx.vstack(loading_line(MapState.loading, "Nokta analiz ediliyor…"),
-                      rx.text("Haritada bir noktaya tıklayın.", size="2", class_name="muted")),
+                      rx.text("Haritada bir noktaya tıklayın.", size="2", class_name="muted"),
+                      layer_toggles(), spacing="3", width="100%"),
         ),
     )
     return section(
-        "Konum", "01 · Haritada seçilen nokta tüm sayfayı belirler",
+        "Konum",
         rx.grid(
             rx.box(rx.box(kktc_map("420px"), class_name="panel", padding="0", overflow="hidden"),
                    grid_column=rx.breakpoints(initial="span 1", md="span 2")),
             summary,
             columns=rx.breakpoints(initial="1", md="3"), spacing="3", width="100%",
         ),
-        zones_legend(),
+        investor_brief(),
         error_box(MapState.error),
         href="/veriler/harita",
     )
@@ -43,7 +74,7 @@ def map_section() -> rx.Component:
 
 def production_section() -> rx.Component:
     return section(
-        "Üretim", "02 · " + AnalysisState.place,
+        "Üretim",
         error_box(AnalysisState.error),
         rx.grid(
             rx.box(panel(eyebrow("Önümüzdeki 48 saat (MW)"), rx.plotly(data=AnalysisState.fig_forecast, width="100%")),
@@ -58,7 +89,7 @@ def production_section() -> rx.Component:
 
 def scenario_section() -> rx.Component:
     return section(
-        "Senaryolar", "03 · " + ScenarioState.place,
+        "Senaryolar",
         error_box(ScenarioState.error),
         loading_line(ScenarioState.loading, "Bölgeler simüle ediliyor…"),
         rx.cond(
@@ -91,5 +122,4 @@ def veriler() -> rx.Component:
         scenario_section(),
         nav="/veriler",
         title="Veriler",
-        subtitle="Haritada bir nokta seçin; o nokta ve ilçesi için özet. Ayrıntı: 'Tümünü göster'.",
     )

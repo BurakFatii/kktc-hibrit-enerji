@@ -68,6 +68,5 @@ def analiz() -> rx.Component:
             default_value="tahmin", width="100%",
         ),
         title="Üretim",
-        subtitle="Haritada seçili noktadaki santral ve noktanın ilçesinin ihtiyacı: tahmin ve geçmiş yıl verileri.",
         back=("Veriler", "/veriler"),
     )

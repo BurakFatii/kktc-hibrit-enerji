@@ -122,6 +122,4 @@ def ayarlar() -> rx.Component:
         ),
         nav="/ayarlar",
         title="Ayarlar",
-        subtitle="Cihazlarınızın etiket değerlerini girin; hesaplamaları uygulama yapar. "
-                 "Değerler bu tarayıcıda saklanır.",
     )

@@ -15,6 +15,11 @@ def panel(*children, **props) -> rx.Component:
     return rx.box(*children, class_name="panel " + props.pop("extra_class", ""), **props)
 
 
+def live_dot(title: str = "Canlı veri") -> rx.Component:
+    """'Şu an' yazısı yerine: yanıp sönen küçük nokta (canlı veri)."""
+    return rx.box(class_name="live-dot", custom_attrs={"title": title, "aria-label": title, "role": "img"})
+
+
 def eyebrow(text) -> rx.Component:
     return rx.text(text, class_name="eyebrow")
 

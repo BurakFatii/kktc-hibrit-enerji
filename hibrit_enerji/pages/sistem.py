@@ -132,6 +132,5 @@ def sistem() -> rx.Component:
             ),
         ),
         title="Sistem ayrıntıları",
-        subtitle="Tesisin anlık durumu, bugünkü enerji dengesi, kurulum yönleri ve önümüzdeki 24 saat.",
         back=("Ana Sayfa", "/"),
     )

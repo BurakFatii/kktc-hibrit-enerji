@@ -24,6 +24,9 @@ cd kktc-hibrit-enerji
 python3.13 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/reflex run          # http://localhost:3000
+# veya: source .venv/bin/activate && reflex run
+# Sistemdeki başka bir `reflex` (ör. Homebrew Python 3.14) rxconfig.py tarafından durdurulur.
+cp .env.example .env          # yatırımcı özeti için GEMINI_API_KEY
 ```
 
 ```bash

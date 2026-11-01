@@ -8,13 +8,16 @@ from typing import Any
 import plotly.graph_objects as go
 import reflex as rx
 
-from . import charts, services
+from . import ai_brief, charts, services
+from .core import fields
 from .core.config import (FALLBACK_LOCATION, REGION_BY_NAME, REGION_KINDS, REGIONS,
                           nearest_region)
 from .core.spec import SystemSpec
 
 GEO_JS = """
 new Promise((resolve) => {
+  // İzin penceresi yanıtsız kalırsa tarayıcının kendi zaman aşımı işlemez; genel sınır -> Lefkoşa yedeği
+  setTimeout(() => resolve({ok: false, error: "Konum izni yanıtlanmadı."}), 12000);
   if (!navigator.geolocation) { resolve({ok: false, error: "Tarayıcı konum desteklemiyor."}); return; }
   navigator.geolocation.getCurrentPosition(
     (p) => resolve({ok: true, lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy}),
@@ -176,6 +179,19 @@ class MapState(rx.State):
     fig_monthly: go.Figure = charts.empty()
     fig_rose: go.Figure = charts.empty()
     fig_wind_heat: go.Figure = charts.empty()
+    # Yapay zekâ yatırımcı özeti (Veriler > Konum)
+    brief: str = ""
+    brief_loading: bool = False
+    brief_error: str = ""
+    _brief_input: dict[str, Any] = {}
+    _brief_seq: int = 0
+    # Harita katmanları (başta kapalı; açılınca veri bir kez çekilir)
+    show_solar: bool = False
+    show_wind: bool = False
+    solar_field: dict[str, Any] = {}
+    wind_field: dict[str, Any] = {}
+    layer_loading: bool = False
+    layer_error: str = ""
 
     @rx.event
     async def start(self):
@@ -202,6 +218,40 @@ class MapState(rx.State):
     @rx.event
     def toggle_zones(self, value: bool):
         self.show_zones = value
+
+    @rx.event(background=True)
+    async def toggle_solar(self, value: bool):
+        async with self:
+            self.show_solar, need = value, value and not self.solar_field
+            if need:
+                self.layer_loading, self.layer_error = True, ""
+        if not need:
+            return
+        try:
+            f = await asyncio.to_thread(fields.solar_field)
+            err = ""
+        except Exception as e:
+            print(f"[fields] güneş: {e}")
+            f, err = {}, "Güneş katmanı verisi alınamadı."
+        async with self:
+            self.solar_field, self.layer_error, self.layer_loading = f, err, False
+
+    @rx.event(background=True)
+    async def toggle_wind(self, value: bool):
+        async with self:
+            self.show_wind = value
+            if value:
+                self.layer_loading, self.layer_error = True, ""
+        if not value:
+            return
+        try:  # 15 dk önbellekli; her açılışta güncel rüzgâr
+            f = await asyncio.to_thread(fields.wind_field)
+            err = ""
+        except Exception as e:
+            print(f"[fields] rüzgâr: {e}")
+            f, err = {}, "Rüzgâr katmanı verisi alınamadı."
+        async with self:
+            self.wind_field, self.layer_error, self.layer_loading = f or self.wind_field, err, False
 
     @rx.event
     async def start_summary(self):
@@ -289,10 +339,33 @@ class MapState(rx.State):
                 + (". Fark büyük: bölgesel hava modelleri sırt ve burun etkisini tam yansıtmaz; "
                    "ölçüm direği veya yüksek çözünürlüklü rüzgâr atlası ile doğrulanmalı."
                    if v100 < float(claim) - 1 else ". Veri iddiayı destekliyor."))
+        self._brief_input = {"label": self.sel_label, "region": dict(self.region),
+                             "d": {k: d[k] for k in ai_brief.INPUT_KEYS}}
         self.loading = False
         # Haritadaki seçim, Üretim ve Senaryolar'ın da hedefidir
+        yield MapState.write_brief
         yield AnalysisState.refresh
         yield ScenarioState.run_selected
+
+    @rx.event(background=True)
+    async def write_brief(self):
+        """Seçili noktanın verilerini yatırımcıya anlatan metin (Gemini). Analizi bekletmez."""
+        async with self:
+            self._brief_seq += 1
+            seq, inp = self._brief_seq, self._brief_input
+            self.brief, self.brief_error, self.brief_loading = "", "", bool(inp)
+        if not inp:
+            return
+        text, err = "", ""
+        try:
+            text = await ai_brief.investor_brief(inp["label"], inp["d"], inp["region"] or None)
+        except Exception as e:
+            print(f"[ai_brief] {e}")
+            err = "Yapay zekâ özeti şu an alınamadı."
+        async with self:
+            if seq != self._brief_seq:  # bu arada başka nokta seçildi
+                return
+            self.brief, self.brief_error, self.brief_loading = text, err, False
 
 
 # ======================================================================= ANALİZ

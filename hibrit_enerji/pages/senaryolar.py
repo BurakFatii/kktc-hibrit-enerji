@@ -88,6 +88,4 @@ def senaryolar() -> rx.Component:
         ),
         back=("Veriler", "/veriler"),
         title="Senaryolar ve doğrulama",
-        subtitle="Seçili noktanın ilçesinin ihtiyacı için: yalnızca güneş, yalnızca rüzgâr, hibrit ve batarya + "
-                 "akıllı yönetimli hibrit; geçmiş yılın saatlik verisiyle bir yıl boyunca.",
     )
