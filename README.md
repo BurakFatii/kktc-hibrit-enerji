@@ -3,20 +3,6 @@
 Kuzey Kıbrıs'ta kamu kurumları ve şirketler için **güneş + rüzgâr + batarya + akıllı enerji yönetimi**.
 Hangi bölgede, hangi kapasitede ve hangi kontrol stratejisiyle verimli çalışacağını saatlik meteoroloji verisiyle gösterir.
 
-Proje özeti: [`kaynak/proje-ozeti.jpg`](kaynak/proje-ozeti.jpg) · Jüri kriterleri: [`kaynak/juri-kriterleri.pdf`](kaynak/juri-kriterleri.pdf)
-
-## Jüri kriterleri belgeleri (takım için)
-
-| Kriter | Belge |
-|---|---|
-| K1 · Problem tanımı ve çözüm uyumu | [docs/K1-problem-ve-cozum-uyumu.md](docs/K1-problem-ve-cozum-uyumu.md) |
-| K2 · Yenilikçilik, özgünlük, katma değer | [docs/K2-yenilikcilik-ozgunluk-katma-deger.md](docs/K2-yenilikcilik-ozgunluk-katma-deger.md) |
-| K3 · Somut prototip ve teknik doğrulama | [docs/K3-prototip-ve-teknik-dogrulama.md](docs/K3-prototip-ve-teknik-dogrulama.md) |
-| K4 · Uygulanabilirlik ve fizibilite | [docs/K4-uygulanabilirlik-ve-fizibilite.md](docs/K4-uygulanabilirlik-ve-fizibilite.md) |
-| K5 · Sürdürülebilirlik ve etki | [docs/K5-surdurulebilirlik-ve-etki.md](docs/K5-surdurulebilirlik-ve-etki.md) |
-
-Belgelerdeki sayılar `scripts/rapor.py` ile üretilir. Uygulama değiştikçe bu betik yeniden çalıştırılır ve tablolar güncellenir.
-
 ## Çalıştırma
 
 ```bash
